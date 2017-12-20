@@ -1,0 +1,61 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Linear Rergression
+
+### 3.6 Lab Exercises
+
+We'll use the MASS package, which contains very large collection of datasetes and functions. We'll also load the ISLR package to use its data sets.
+
+```{r}
+library(MASS)
+library(ISLR)
+names(Boston)
+```
+
+To fit a simple linear regression, we'll use the *lm()* function with *medv* (Median value of owner occupied homes in $1000s) as the response and *lstat* (lower status of the population in %) as the predictor. The basic syntax is `lm.fit=lm(y~x,data)`, where y is the response and x is the predictor and data is the data set in which these two variables are kept.
+
+```{r}
+lm.fit=lm(medv~lstat,data=Boston)
+lm.fit
+summary(lm.fit)
+```
+
+We can get more info about the model features and we can now make predictions with confidence/prediction intervals for a given value of *lstat*. Notice how the prediction intervals are far wider than the confidence intervals, this is normal.
+
+```{r}
+confint(lm.fit)
+predict(lm.fit,data.frame(lstat=c(5,10,15)), interval="confidence")
+predict(lm.fit,data.frame(lstat=c(5,10,15)), interval="prediction")
+```
+
+It's always good to make a few plots and visualise some important stast and the regression line itself.
+
+```{r}
+plot(Boston$lstat,Boston$medv,pch="+",xlab="Lower Status in %", ylab = "Median Home Value")
+abline(lm.fit,lwd=3,col="red")
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(lm.fit,pch="+")
+```
+
+We can also compute the residuals from a linear regression with the function *residuals()* and get the studentized residuals with the *rstudent()* function.
+
+```{r}
+plot(predict(lm.fit), residuals(lm.fit))
+plot(predict(lm.fit), rstudent(lm.fit))
+```
+
+The plots show some evidence of non-linearity. We can check for the leverage statistics with the *hatvaluse()* function.
+
+For multiple regression we use the same *lm()* function, the syntax is `lm(y~x1+x2+x3)` where the three predictors are x1 to x3. We can then use the *summary()* function to check the coefficients of all the predictors. If we want to regress onto all of the predictors we can use a dot: `lm(y~.,data=Boston)`. And what if we want to use all of the factors but one, then we can use `lm(y~.-age,data=Bosotn)` and remove the unwanted predictor with the minus sign.
+
+```{r}
+lm.fit=lm(medv~lstat+age,data=Boston)
+summary(lm.fit)
+```
+
